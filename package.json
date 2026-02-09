@@ -1,0 +1,50 @@
+{
+  "name": "studenthub-management",
+  "version": "2.0.0",
+  "description": "Professional Student Management System - A modern, responsive, and accessible student management interface",
+  "main": "src/index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build step required'",
+    "preview": "vercel dev --listen 3000",
+    "deploy": "vercel --prod",
+    "lint": "echo 'Add linting configuration if needed'",
+    "format": "echo 'Add formatting configuration if needed'",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug"
+  },
+  "keywords": [
+    "student-management",
+    "education",
+    "dashboard",
+    "analytics",
+    "responsive",
+    "accessible",
+    "modern",
+    "supabase",
+    "vercel",
+    "serverless"
+  ],
+  "author": "StudentHub Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/studenthub-management.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/studenthub-management/issues"
+  },
+  "homepage": "https://github.com/your-username/studenthub-management#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "vercel": "^28.0.0"
+  }
+}
