@@ -1,37 +1,34 @@
 {
   "version": 2,
-  "routes": [
+  "cleanUrls": true,
+  "rewrites": [
     {
-      "src": "/",
-      "dest": "/src/index.html"
+      "source": "/login",
+      "destination": "/src/login.html"
     },
     {
-      "src": "/login",
-      "dest": "/src/login.html"
+      "source": "/signup",
+      "destination": "/src/signup.html"
     },
     {
-      "src": "/signup",
-      "dest": "/src/signup.html"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/styles/(.*)",
+      "destination": "/src/styles/$1"
     },
     {
-      "src": "/styles/(.*)",
-      "dest": "/src/styles/$1"
+      "source": "/js/(.*)",
+      "destination": "/src/js/$1"
     },
     {
-      "src": "/js/(.*)",
-      "dest": "/src/js/$1"
+      "source": "/script.js",
+      "destination": "/src/script.js"
     },
     {
-      "src": "/script.js",
-      "dest": "/src/script.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/src/$1"
+      "source": "/(.*)",
+      "destination": "/src/index.html"
     }
   ],
   "env": {
