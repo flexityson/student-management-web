@@ -31,11 +31,6 @@
       "destination": "/src/index.html"
     }
   ],
-  "env": {
-    "SUPABASE_URL": "@supabase-url",
-    "SUPABASE_ANON_KEY": "@supabase-anon-key",
-    "SUPABASE_SERVICE_ROLE_KEY": "@supabase-service-role-key"
-  },
   "headers": [
     {
       "source": "/src/styles/(.*)",
