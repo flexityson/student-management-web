@@ -71,11 +71,3 @@ yarn.lock
 # Backup files
 *.bak
 *.backup
-
-# Old files (keep for reference but ignore in new commits)
-index.html
-styles.css
-styles-improved.css
-styles-professional.css
-script-old.js
-index-improved.html

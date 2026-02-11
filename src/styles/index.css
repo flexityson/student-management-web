@@ -1,5 +1,7 @@
-/* Import existing main styles */
-@import './main.css';
+/* Import optimized CSS modules */
+@import './variables.css';
+@import './layout.css';
+@import './components.css';
 @import './auth.css';
 @import './dashboard.css';
 
