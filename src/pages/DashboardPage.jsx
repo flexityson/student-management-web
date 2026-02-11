@@ -1,9 +1,33 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import { StudentService, AnalyticsService } from '../services/api'
 import '../styles/dashboard.css'
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalHomework: 0,
+    attendanceRate: 0,
+    loading: true
+  })
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const dashboardStats = await AnalyticsService.getDashboardStats(user.id)
+        setStats({
+          ...dashboardStats,
+          loading: false
+        })
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error)
+        setStats(prev => ({ ...prev, loading: false }))
+      }
+    }
+
+    loadDashboardData()
+  }, [user])
 
   const handleSignOut = async () => {
     await signOut()
@@ -33,34 +57,41 @@ export default function DashboardPage() {
           <p>Manage your students and track their progress efficiently.</p>
         </div>
         
-        <div className="dashboard-grid">
-          <div className="dashboard-card">
-            <div className="card-icon">
-              <i className="fas fa-users" />
-            </div>
-            <h3>Students</h3>
-            <p>View and manage your student roster</p>
-            <button className="btn btn-primary">Manage Students</button>
+        {stats.loading ? (
+          <div className="loading-section">
+            <div className="loading-spinner"></div>
+            <p>Loading dashboard data...</p>
           </div>
-          
-          <div className="dashboard-card">
-            <div className="card-icon">
-              <i className="fas fa-tasks" />
+        ) : (
+          <div className="dashboard-grid">
+            <div className="dashboard-card">
+              <div className="card-icon">
+                <i className="fas fa-users" />
+              </div>
+              <h3>Students</h3>
+              <p>Total enrolled: {stats.totalStudents}</p>
+              <button className="btn btn-primary">Manage Students</button>
             </div>
-            <h3>Homework</h3>
-            <p>Create and track homework assignments</p>
-            <button className="btn btn-primary">Manage Homework</button>
-          </div>
-          
-          <div className="dashboard-card">
-            <div className="card-icon">
-              <i className="fas fa-chart-line" />
+            
+            <div className="dashboard-card">
+              <div className="card-icon">
+                <i className="fas fa-tasks" />
+              </div>
+              <h3>Homework</h3>
+              <p>Pending assignments: {stats.totalHomework}</p>
+              <button className="btn btn-primary">Manage Homework</button>
             </div>
-            <h3>Analytics</h3>
-            <p>View student performance and progress</p>
-            <button className="btn btn-primary">View Analytics</button>
+            
+            <div className="dashboard-card">
+              <div className="card-icon">
+                <i className="fas fa-chart-line" />
+              </div>
+              <h3>Attendance</h3>
+              <p>Average rate: {stats.attendanceRate}%</p>
+              <button className="btn btn-primary">View Reports</button>
+            </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   )

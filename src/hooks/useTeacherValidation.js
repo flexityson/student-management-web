@@ -1,37 +1,27 @@
 import { useState } from 'react'
+import TeacherValidationService from '../services/validation'
 
 export function useTeacherValidation() {
   const [validating, setValidating] = useState(false)
   const [validationError, setValidationError] = useState(null)
+  const [remainingAttempts, setRemainingAttempts] = useState(5)
 
   const validateTeacherAccessCode = async (accessCode) => {
     setValidating(true)
     setValidationError(null)
 
     try {
-      const response = await fetch('/api/validate-teacher', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ accessCode }),
-      })
-
-      const data = await response.json()
-
-      if (!data.success) {
-        if (data.message === 'Fail') {
-          throw new Error('Unauthorized Access')
-        } else {
-          throw new Error(data.message || 'Access code validation failed')
-        }
+      const result = await TeacherValidationService.validateWithRateLimit(accessCode)
+      
+      if (!result.success) {
+        setValidationError(result.error)
+        setRemainingAttempts(TeacherValidationService.getRemainingAttempts())
+      } else {
+        setValidationError(null)
+        setRemainingAttempts(5)
       }
 
-      return { success: true }
-    } catch (error) {
-      const errorMessage = error.message || 'Failed to validate access code'
-      setValidationError(errorMessage)
-      return { success: false, error: errorMessage }
+      return result
     } finally {
       setValidating(false)
     }
@@ -41,10 +31,22 @@ export function useTeacherValidation() {
     setValidationError(null)
   }
 
+  const clearAttempts = () => {
+    TeacherValidationService.clearAttempts()
+    setRemainingAttempts(5)
+  }
+
+  // Update remaining attempts on mount
+  useState(() => {
+    setRemainingAttempts(TeacherValidationService.getRemainingAttempts())
+  })
+
   return {
     validateTeacherAccessCode,
     validating,
     validationError,
-    clearValidationError
+    clearValidationError,
+    clearAttempts,
+    remainingAttempts
   }
 }

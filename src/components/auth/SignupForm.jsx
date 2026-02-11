@@ -11,7 +11,7 @@ export default function SignupForm() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { signUp, loading, error, clearError } = useAuth()
-  const { validateTeacherAccessCode, validating, validationError, clearValidationError } = useTeacherValidation()
+  const { validateTeacherAccessCode, validating, validationError, clearValidationError, remainingAttempts } = useTeacherValidation()
   
   const [formData, setFormData] = useState({
     fullName: '',
@@ -268,6 +268,17 @@ export default function SignupForm() {
             autoComplete="off"
             error={fieldErrors.teacherAccessCode}
           />
+          
+          {remainingAttempts < 5 && (
+            <div style={{ 
+              fontSize: 'var(--font-size-xs)', 
+              color: 'var(--color-warning)', 
+              marginTop: 'var(--space-2)',
+              textAlign: 'center'
+            }}>
+              {remainingAttempts} attempts remaining
+            </div>
+          )}
           
           <div className="form-group">
             <label className="form-label">

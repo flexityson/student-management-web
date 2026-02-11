@@ -1,0 +1,108 @@
+/* Toast Notification System */
+
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  min-width: 300px;
+  max-width: 500px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all var(--transition-normal);
+  font-family: var(--font-family-primary);
+}
+
+.toast-notification.toast-show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-notification.toast-hide {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  gap: var(--space-3);
+}
+
+.toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+
+.toast-success .toast-icon {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.toast-error .toast-icon {
+  background-color: var(--color-error);
+  color: var(--color-white);
+}
+
+.toast-warning .toast-icon {
+  background-color: var(--color-warning);
+  color: var(--color-white);
+}
+
+.toast-info .toast-icon {
+  background-color: var(--color-info);
+  color: var(--color-white);
+}
+
+.toast-message {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-normal);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-text-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .toast-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    right: 10px;
+    min-width: auto;
+    max-width: none;
+  }
+  
+  .toast-content {
+    padding: var(--space-2) var(--space-3);
+  }
+}
