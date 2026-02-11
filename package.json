@@ -38,8 +38,9 @@
   },
   "homepage": "https://github.com/your-username/studenthub-management#readme",
   "engines": {
-    "node": ">=14.0.0"
+    "node": "18.x"
   },
+  "type": "module",
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
     "react": "^18.2.0",
