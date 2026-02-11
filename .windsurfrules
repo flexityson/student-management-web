@@ -1,0 +1,47 @@
+# Teacher-only Student Management System
+
+## Project Overview
+This is a Teacher-only Student Management System built with React, CSS, and Supabase as the backend.
+
+## Architecture
+- **Frontend**: React application using Vite, located in `src/` folder
+- **Backend**: Vercel serverless functions located in `api/` folder
+- **Database**: Supabase PostgreSQL database
+- **Routing**: React Router for client-side routing
+- **Styling**: CSS modules with existing design system
+
+## Key Rules
+1. **Teacher-Only Access**: All features must enforce teacher-only access control
+2. **Environment Variables**: Always check for required environment variables before suggesting database code or Supabase operations
+3. **File Structure**: 
+   - React components go in `src/components/`
+   - Pages go in `src/pages/`
+   - Hooks go in `src/hooks/`
+   - Styles go in `src/styles/`
+   - API endpoints go in `api/`
+   - Follow existing naming conventions
+
+## Required Environment Variables
+Before any database operations, ensure these are available:
+- SUPABASE_URL
+- SUPABASE_ANON_KEY
+- SUPABASE_SERVICE_ROLE_KEY
+- TEACHER_ACCESS_CODE
+
+## React-Specific Guidelines
+- Use functional components with hooks
+- Implement proper error boundaries and loading states
+- Use React Router for navigation
+- Maintain teacher-only access control in all components
+- Use the existing Supabase client configuration in `src/js/supabaseClient.js`
+- Follow the established API patterns in the `api/` folder
+- Ensure all forms include proper validation and error handling
+- Use custom hooks for authentication and data fetching
+
+## Development Guidelines
+- Always validate teacher authentication before allowing any student data operations
+- Use React hooks for state management and side effects
+- Implement proper cleanup in useEffect hooks
+- Follow React best practices for component composition
+- Ensure all components are accessible and responsive
+- Use the existing CSS design system for consistent styling

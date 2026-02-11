@@ -1,39 +1,21 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "rewrites": [
-    {
-      "source": "/login",
-      "destination": "/src/login.html"
-    },
-    {
-      "source": "/signup",
-      "destination": "/src/signup.html"
-    },
     {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },
     {
-      "source": "/styles/(.*)",
-      "destination": "/src/styles/$1"
-    },
-    {
-      "source": "/js/(.*)",
-      "destination": "/src/js/$1"
-    },
-    {
-      "source": "/script.js",
-      "destination": "/src/script.js"
-    },
-    {
       "source": "/(.*)",
-      "destination": "/src/index.html"
+      "destination": "/index.html"
     }
   ],
   "headers": [
     {
-      "source": "/src/styles/(.*)",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -42,7 +24,7 @@
       ]
     },
     {
-      "source": "/src/js/(.*)",
+      "source": "/(.*).js",
       "headers": [
         {
           "key": "Cache-Control",
@@ -51,29 +33,11 @@
       ]
     },
     {
-      "source": "/src/script.js",
+      "source": "/(.*).css",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/public/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*).html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
         }
       ]
     }
