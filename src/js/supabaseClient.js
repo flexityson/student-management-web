@@ -3,7 +3,7 @@
  * Initializes and exports the Supabase client for use throughout the application
  */
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { createClient } from '@supabase/supabase-js';
 
 // Environment variables - these will be injected by Vercel at build time
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || window.ENV?.SUPABASE_URL;
