@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/your-username/studenthub-management#readme",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "type": "module",
   "dependencies": {
