@@ -9,7 +9,8 @@ export default function DashboardPage() {
     totalStudents: 0,
     totalHomework: 0,
     attendanceRate: 0,
-    loading: true
+    loading: true,
+    error: null
   })
 
   useEffect(() => {
@@ -21,8 +22,7 @@ export default function DashboardPage() {
           loading: false
         })
       } catch (error) {
-        console.error('Failed to load dashboard data:', error)
-        setStats(prev => ({ ...prev, loading: false }))
+        setStats(prev => ({ ...prev, loading: false, error: error.message }))
       }
     }
 
@@ -57,7 +57,14 @@ export default function DashboardPage() {
           <p>Manage your students and track their progress efficiently.</p>
         </div>
         
-        {stats.loading ? (
+        {stats.error ? (
+          <div className="error-section">
+            <p>Failed to load dashboard data. Please try again.</p>
+            <button onClick={() => window.location.reload()} className="btn btn-primary">
+              Retry
+            </button>
+          </div>
+        ) : stats.loading ? (
           <div className="loading-section">
             <div className="loading-spinner"></div>
             <p>Loading dashboard data...</p>

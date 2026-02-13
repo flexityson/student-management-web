@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Teacher Signup Flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/src/signup.html');
+    await page.goto('/signup');
   });
 
   test('should show error with wrong teacher access code', async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe('Teacher Signup Flow', () => {
     await page.fill('#email', 'test@example.com');
     await page.fill('#password', 'password123');
     await page.fill('#confirm-password', 'password123');
-    await page.fill('#teacher-access-code', 'YourSecretCodeHere'); // Using the code from .env.example
+    await page.fill('#teacher-access-code', 'TEACHER123'); // Using the code from .env.example
     await page.check('#terms');
 
     // Submit the form
@@ -76,7 +76,7 @@ test.describe('Teacher Signup Flow', () => {
     await page.fill('#email', 'test@example.com');
     await page.fill('#password', 'password123');
     await page.fill('#confirm-password', 'differentpassword');
-    await page.fill('#teacher-access-code', 'YourSecretCodeHere');
+    await page.fill('#teacher-access-code', 'TEACHER123');
     await page.check('#terms');
 
     // Submit the form

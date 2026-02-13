@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TeacherValidationService from '../services/validation'
 
 export function useTeacherValidation() {
@@ -37,9 +37,9 @@ export function useTeacherValidation() {
   }
 
   // Update remaining attempts on mount
-  useState(() => {
+  useEffect(() => {
     setRemainingAttempts(TeacherValidationService.getRemainingAttempts())
-  })
+  }, [])
 
   return {
     validateTeacherAccessCode,

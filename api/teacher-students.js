@@ -1,6 +1,18 @@
 // Vercel Serverless Function for Teacher-Student Management
 // Handles CRUD operations for students with teacher-specific access control
 
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 // Helper function to validate student data
 function validateStudentData(data) {
   const required = ['student_name', 'grade'];
@@ -28,17 +40,14 @@ async function verifyTeacher(authHeader) {
   const token = authHeader.split(' ')[1];
   
   try {
-    // This would normally verify with Supabase, but for security,
-    // we'll keep the validation simple and rely on the token being valid
-    // In production, you should verify the token with your auth provider
+    // Verify the JWT token with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token);
     
-    // Extract user ID from token (simplified for demo)
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    if (!payload.sub) {
+    if (error || !user) {
       throw new Error('Invalid authentication token');
     }
     
-    return { userId: payload.sub };
+    return { userId: user.id, user };
   } catch (error) {
     throw new Error('Authentication failed: ' + error.message);
   }
@@ -66,8 +75,8 @@ module.exports = async (req, res) => {
   
   try {
     // Verify teacher authentication for all methods except OPTIONS
-    const { teacherProfile } = await verifyTeacher(req.headers.authorization);
-    const teacherId = teacherProfile.id;
+    const { userId } = await verifyTeacher(req.headers.authorization);
+    const teacherId = userId;
     
     switch (req.method) {
       case 'GET':

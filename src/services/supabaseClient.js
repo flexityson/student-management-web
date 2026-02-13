@@ -11,8 +11,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || window.ENV?.
 
 // Validate environment variables
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error('Missing Supabase environment variables. Please check your configuration.');
-  throw new Error('Supabase configuration is missing. Please contact support.');
+  throw new Error('Supabase configuration is missing. Please check your environment variables.');
 }
 
 // Create Supabase client
@@ -57,7 +56,6 @@ export const auth = {
       if (error) throw error;
       return { success: true, data };
     } catch (error) {
-      console.error('Sign up error:', error);
       return { success: false, error: error.message };
     }
   },
@@ -78,7 +76,6 @@ export const auth = {
       if (error) throw error;
       return { success: true, data };
     } catch (error) {
-      console.error('Sign in error:', error);
       return { success: false, error: error.message };
     }
   },
@@ -93,7 +90,6 @@ export const auth = {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Sign out error:', error);
       return { success: false, error: error.message };
     }
   },
@@ -108,7 +104,6 @@ export const auth = {
       if (error) throw error;
       return { success: true, session };
     } catch (error) {
-      console.error('Get current user error:', error);
       return { success: false, error: error.message };
     }
   },
@@ -135,7 +130,6 @@ export const auth = {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Reset password error:', error);
       return { success: false, error: error.message };
     }
   },
@@ -170,7 +164,6 @@ export const db = {
       if (error) throw error;
       return { success: true, data };
     } catch (error) {
-      console.error('Get students error:', error);
       return { success: false, error: error.message };
     }
   },
@@ -191,7 +184,6 @@ export const db = {
       if (error) throw error;
       return { success: true, data };
     } catch (error) {
-      console.error('Create student error:', error);
       return { success: false, error: error.message };
     }
   },
@@ -214,7 +206,6 @@ export const db = {
       if (error) throw error;
       return { success: true, data };
     } catch (error) {
-      console.error('Update student error:', error);
       return { success: false, error: error.message };
     }
   },
@@ -234,7 +225,6 @@ export const db = {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Delete student error:', error);
       return { success: false, error: error.message };
     }
   },
@@ -262,7 +252,6 @@ export const db = {
       if (error) throw error;
       return { success: true, data };
     } catch (error) {
-      console.error('Update attendance error:', error);
       return { success: false, error: error.message };
     }
   },

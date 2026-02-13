@@ -6,6 +6,7 @@ yarn-error.log*
 
 # Vercel
 .vercel
+.vercelignore
 
 # Environment variables
 .env
@@ -13,6 +14,7 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env.example
 
 # IDE
 .vscode/
@@ -33,6 +35,10 @@ Thumbs.db
 # Logs
 logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # Runtime data
 pids
@@ -42,10 +48,13 @@ pids
 
 # Coverage directory used by tools like istanbul
 coverage/
+*.lcov
 
 # Build outputs
 dist/
 build/
+.next/
+out/
 
 # Temporary folders
 tmp/
@@ -54,6 +63,8 @@ temp/
 # Cache
 .cache/
 .parcel-cache/
+.eslintcache
+.stylelintcache
 
 # Optional npm cache directory
 .npm
@@ -64,6 +75,7 @@ temp/
 # Package managers
 package-lock.json
 yarn.lock
+pnpm-lock.yaml
 
 # Local development
 .local/
@@ -71,3 +83,33 @@ yarn.lock
 # Backup files
 *.bak
 *.backup
+*.orig
+
+# Test reports
+playwright-report/
+test-results/
+coverage/
+
+# Misc
+*.tgz
+*.tar.gz
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python files (remove after migration)
+*.py
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Server files (remove after migration)
+simple-server.py
+serve.py

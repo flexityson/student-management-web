@@ -3,7 +3,7 @@
  * Handles all Supabase database operations with professional error handling
  */
 
-import { supabase } from '../js/supabaseClient.js'
+import { supabase } from './supabaseClient.js'
 
 // Professional error messages
 const ERROR_MESSAGES = {
@@ -72,8 +72,6 @@ class ToastManager {
 // Error handler utility
 class ErrorHandler {
   static handle(error, context = '') {
-    console.error(`API Error [${context}]:`, error)
-    
     let message = ERROR_MESSAGES.UNKNOWN
     let type = 'error'
 
@@ -187,7 +185,7 @@ export const StudentService = {
         }
 
         // Validate grade format
-        const gradeRegex = /^[K-9][0-9]*(st|nd|rd|th)? Grade$/i
+        const gradeRegex = /^[Kk][0-9]*(st|nd|rd|th)? Grade$/i
         if (!gradeRegex.test(studentData.grade) && !/^[0-9]+[A-Z]?$/.test(studentData.grade)) {
           throw new Error('Invalid grade format. Use formats like "5th Grade", "K", or "5A"')
         }
@@ -237,7 +235,7 @@ export const StudentService = {
 
           // Validate grade format if provided
           if (updates.grade) {
-            const gradeRegex = /^[K-9][0-9]*(st|nd|rd|th)? Grade$/i
+            const gradeRegex = /^[Kk][0-9]*(st|nd|rd|th)? Grade$/i
             if (!gradeRegex.test(updates.grade) && !/^[0-9]+[A-Z]?$/.test(updates.grade)) {
               throw new Error('Invalid grade format. Use formats like "5th Grade", "K", or "5A"')
             }

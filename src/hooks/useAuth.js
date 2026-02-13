@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { auth, utils } from '../js/supabaseClient.js'
+import { auth, utils } from '../services/supabaseClient.js'
 
 export function useAuth() {
   const [user, setUser] = useState(null)
@@ -8,18 +8,26 @@ export function useAuth() {
 
   // Check current session on mount
   useEffect(() => {
+    let isMounted = true
+    
     const checkSession = async () => {
       try {
         const { success, session, error } = await auth.getCurrentUser()
-        if (success && session) {
-          setUser(session.user)
-        } else if (error) {
-          setError(error)
+        if (isMounted) {
+          if (success && session) {
+            setUser(session.user)
+          } else if (error) {
+            setError(error)
+          }
         }
       } catch (err) {
-        setError(err.message)
+        if (isMounted) {
+          setError(err.message)
+        }
       } finally {
-        setLoading(false)
+        if (isMounted) {
+          setLoading(false)
+        }
       }
     }
 
@@ -28,16 +36,21 @@ export function useAuth() {
     // Listen for auth changes
     const { data: { subscription } } = auth.client.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'SIGNED_IN') {
-          setUser(session.user)
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null)
+        if (isMounted) {
+          if (event === 'SIGNED_IN') {
+            setUser(session.user)
+          } else if (event === 'SIGNED_OUT') {
+            setUser(null)
+          }
+          setLoading(false)
         }
-        setLoading(false)
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signIn = useCallback(async (email, password) => {

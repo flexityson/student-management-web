@@ -101,15 +101,19 @@ END;
 $$ language 'plpgsql';
 
 -- Create Triggers for updated_at
+DROP TRIGGER IF EXISTS update_teacher_profiles_updated_at ON teacher_profiles;
 CREATE TRIGGER update_teacher_profiles_updated_at BEFORE UPDATE ON teacher_profiles
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_students_updated_at ON students;
 CREATE TRIGGER update_students_updated_at BEFORE UPDATE ON students
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_subjects_updated_at ON subjects;
 CREATE TRIGGER update_subjects_updated_at BEFORE UPDATE ON subjects
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_student_grades_updated_at ON student_grades;
 CREATE TRIGGER update_student_grades_updated_at BEFORE UPDATE ON student_grades
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -130,73 +134,134 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Create Trigger for New User Registration
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
--- Enable Row Level Security (RLS)
-ALTER TABLE teacher_profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE students ENABLE ROW LEVEL SECURITY;
-ALTER TABLE attendance_records ENABLE ROW LEVEL SECURITY;
-ALTER TABLE subjects ENABLE ROW LEVEL SECURITY;
-ALTER TABLE student_grades ENABLE ROW LEVEL SECURITY;
+-- Enable Row Level Security (RLS) - Only enable if not already enabled
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_tables 
+        WHERE schemaname = 'public' 
+        AND tablename = 'teacher_profiles' 
+        AND rowsecurity = true
+    ) THEN
+        ALTER TABLE teacher_profiles ENABLE ROW LEVEL SECURITY;
+    END IF;
+    
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_tables 
+        WHERE schemaname = 'public' 
+        AND tablename = 'students' 
+        AND rowsecurity = true
+    ) THEN
+        ALTER TABLE students ENABLE ROW LEVEL SECURITY;
+    END IF;
+    
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_tables 
+        WHERE schemaname = 'public' 
+        AND tablename = 'attendance_records' 
+        AND rowsecurity = true
+    ) THEN
+        ALTER TABLE attendance_records ENABLE ROW LEVEL SECURITY;
+    END IF;
+    
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_tables 
+        WHERE schemaname = 'public' 
+        AND tablename = 'subjects' 
+        AND rowsecurity = true
+    ) THEN
+        ALTER TABLE subjects ENABLE ROW LEVEL SECURITY;
+    END IF;
+    
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_tables 
+        WHERE schemaname = 'public' 
+        AND tablename = 'student_grades' 
+        AND rowsecurity = true
+    ) THEN
+        ALTER TABLE student_grades ENABLE ROW LEVEL SECURITY;
+    END IF;
+END $$;
 
 -- Create RLS Policies for Teacher Profiles
+DROP POLICY IF EXISTS "Teachers can view own profile" ON teacher_profiles;
 CREATE POLICY "Teachers can view own profile" ON teacher_profiles
     FOR SELECT USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Teachers can update own profile" ON teacher_profiles;
 CREATE POLICY "Teachers can update own profile" ON teacher_profiles
     FOR UPDATE USING (auth.uid() = id);
 
 -- Create RLS Policies for Students (Teacher-specific access)
+DROP POLICY IF EXISTS "Teachers can view own students" ON students;
 CREATE POLICY "Teachers can view own students" ON students
     FOR SELECT USING (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can insert own students" ON students;
 CREATE POLICY "Teachers can insert own students" ON students
     FOR INSERT WITH CHECK (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can update own students" ON students;
 CREATE POLICY "Teachers can update own students" ON students
     FOR UPDATE USING (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can delete own students" ON students;
 CREATE POLICY "Teachers can delete own students" ON students
     FOR DELETE USING (auth.uid() = teacher_id);
 
 -- Create RLS Policies for Attendance Records
+DROP POLICY IF EXISTS "Teachers can view own attendance records" ON attendance_records;
 CREATE POLICY "Teachers can view own attendance records" ON attendance_records
     FOR SELECT USING (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can insert own attendance records" ON attendance_records;
 CREATE POLICY "Teachers can insert own attendance records" ON attendance_records
     FOR INSERT WITH CHECK (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can update own attendance records" ON attendance_records;
 CREATE POLICY "Teachers can update own attendance records" ON attendance_records
     FOR UPDATE USING (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can delete own attendance records" ON attendance_records;
 CREATE POLICY "Teachers can delete own attendance records" ON attendance_records
     FOR DELETE USING (auth.uid() = teacher_id);
 
 -- Create RLS Policies for Subjects
+DROP POLICY IF EXISTS "Teachers can view own subjects" ON subjects;
 CREATE POLICY "Teachers can view own subjects" ON subjects
     FOR SELECT USING (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can insert own subjects" ON subjects;
 CREATE POLICY "Teachers can insert own subjects" ON subjects
     FOR INSERT WITH CHECK (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can update own subjects" ON subjects;
 CREATE POLICY "Teachers can update own subjects" ON subjects
     FOR UPDATE USING (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can delete own subjects" ON subjects;
 CREATE POLICY "Teachers can delete own subjects" ON subjects
     FOR DELETE USING (auth.uid() = teacher_id);
 
 -- Create RLS Policies for Student Grades
+DROP POLICY IF EXISTS "Teachers can view own student grades" ON student_grades;
 CREATE POLICY "Teachers can view own student grades" ON student_grades
     FOR SELECT USING (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can insert own student grades" ON student_grades;
 CREATE POLICY "Teachers can insert own student grades" ON student_grades
     FOR INSERT WITH CHECK (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can update own student grades" ON student_grades;
 CREATE POLICY "Teachers can update own student grades" ON student_grades
     FOR UPDATE USING (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Teachers can delete own student grades" ON student_grades;
 CREATE POLICY "Teachers can delete own student grades" ON student_grades
     FOR DELETE USING (auth.uid() = teacher_id);
 
@@ -260,47 +325,58 @@ GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO authenticated;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
 GRANT EXECUTE ON FUNCTION get_teacher_statistics(UUID) TO authenticated;
 
--- Insert Sample Data (Optional - for testing)
--- Note: This will only work after a teacher is registered
--- Sample subjects
+-- Sample Data (Optional - for testing)
+-- Note: Uncomment and run these sections only after you have registered teachers
+-- Replace the placeholder UUID with actual teacher IDs from your teacher_profiles table
+
+/*
+-- Sample subjects (replace with actual teacher_id)
 INSERT INTO subjects (teacher_id, subject_name, grade_level) VALUES
-('00000000-0000-0000-0000-000000000000', 'Mathematics', '5th Grade'),
-('00000000-0000-0000-0000-000000000000', 'English', '5th Grade'),
-('00000000-0000-0000-0000-000000000000', 'Science', '5th Grade')
+('YOUR_TEACHER_ID_HERE', 'Mathematics', '5th Grade'),
+('YOUR_TEACHER_ID_HERE', 'English', '5th Grade'),
+('YOUR_TEACHER_ID_HERE', 'Science', '5th Grade')
 ON CONFLICT DO NOTHING;
 
--- Sample students (will be associated with the first teacher)
+-- Sample students (replace with actual teacher_id)
 INSERT INTO students (teacher_id, student_name, grade, attendance, parent_email) VALUES
-('00000000-0000-0000-0000-000000000000', 'Alice Johnson', '5th Grade', true, 'alice.parent@email.com'),
-('00000000-0000-0000-0000-000000000000', 'Bob Smith', '5th Grade', false, 'bob.parent@email.com'),
-('00000000-0000-0000-0000-000000000000', 'Charlie Brown', '5th Grade', true, 'charlie.parent@email.com')
+('YOUR_TEACHER_ID_HERE', 'Alice Johnson', '5th Grade', true, 'alice.parent@email.com'),
+('YOUR_TEACHER_ID_HERE', 'Bob Smith', '5th Grade', false, 'bob.parent@email.com'),
+('YOUR_TEACHER_ID_HERE', 'Charlie Brown', '5th Grade', true, 'charlie.parent@email.com')
 ON CONFLICT DO NOTHING;
 
--- Sample attendance records
+-- Sample attendance records (replace with actual student_id and teacher_id)
 INSERT INTO attendance_records (student_id, teacher_id, date, status) VALUES
-('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', CURRENT_DATE, 'present'),
-('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', CURRENT_DATE, 'absent'),
-('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', CURRENT_DATE, 'present')
+('YOUR_STUDENT_ID_HERE', 'YOUR_TEACHER_ID_HERE', CURRENT_DATE, 'present'),
+('YOUR_STUDENT_ID_HERE', 'YOUR_TEACHER_ID_HERE', CURRENT_DATE, 'absent'),
+('YOUR_STUDENT_ID_HERE', 'YOUR_TEACHER_ID_HERE', CURRENT_DATE, 'present')
 ON CONFLICT (student_id, date) DO NOTHING;
 
--- Sample grades
+-- Sample grades (replace with actual IDs)
 INSERT INTO student_grades (student_id, subject_id, teacher_id, assignment_name, grade, max_grade, assignment_type) VALUES
-('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Math Quiz 1', 85, 100, 'quiz'),
-('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'English Essay', 92, 100, 'assignment'),
-('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Science Test', 78, 100, 'test')
+('YOUR_STUDENT_ID_HERE', 'YOUR_SUBJECT_ID_HERE', 'YOUR_TEACHER_ID_HERE', 'Math Quiz 1', 85, 100, 'quiz'),
+('YOUR_STUDENT_ID_HERE', 'YOUR_SUBJECT_ID_HERE', 'YOUR_TEACHER_ID_HERE', 'English Essay', 92, 100, 'assignment'),
+('YOUR_STUDENT_ID_HERE', 'YOUR_SUBJECT_ID_HERE', 'YOUR_TEACHER_ID_HERE', 'Science Test', 78, 100, 'test')
 ON CONFLICT DO NOTHING;
+*/
 
 -- Create Storage Buckets for file uploads (optional)
-INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true);
-INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', false);
+INSERT INTO storage.buckets (id, name, public) VALUES 
+    ('avatars', 'avatars', true) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO storage.buckets (id, name, public) VALUES 
+    ('documents', 'documents', false) 
+ON CONFLICT (id) DO NOTHING;
 
 -- Create Storage Policies
+DROP POLICY IF EXISTS "Teachers can upload own avatar" ON storage.objects;
 CREATE POLICY "Teachers can upload own avatar" ON storage.objects
     FOR INSERT WITH CHECK (
         bucket_id = 'avatars' AND 
         auth.role() = 'authenticated'
     );
 
+DROP POLICY IF EXISTS "Teachers can view own avatar" ON storage.objects;
 CREATE POLICY "Teachers can view own avatar" ON storage.objects
     FOR SELECT USING (
         bucket_id = 'avatars' AND 
