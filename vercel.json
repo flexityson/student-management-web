@@ -60,20 +60,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "api/**/*.js": {
-      "maxDuration": 30,
-      "runtime": "nodejs18.x"
-    }
-  },
-  "env": {
-    "VITE_SUPABASE_URL": "@supabase-url",
-    "VITE_SUPABASE_ANON_KEY": "@supabase-anon-key",
-    "SUPABASE_URL": "@supabase-url",
-    "SUPABASE_ANON_KEY": "@supabase-anon-key",
-    "SUPABASE_SERVICE_ROLE_KEY": "@supabase-service-role-key",
-    "VITE_TEACHER_ACCESS_CODE": "@teacher-access-code",
-    "TEACHER_ACCESS_CODE": "@teacher-access-code"
-  }
+  ]
 }

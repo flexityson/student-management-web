@@ -112,3 +112,4 @@ __pycache__/
 # Server files (remove after migration)
 simple-server.py
 serve.py
+.env*.local
