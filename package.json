@@ -4,9 +4,9 @@
   "description": "Professional Student Management System - A modern, responsive, and accessible student management interface",
   "main": "src/index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "npx vite",
+    "build": "npx vite build",
+    "preview": "npx vite preview",
     "deploy": "vercel --prod",
     "deploy:staging": "vercel",
     "build:check": "npm run build && npm run preview",
