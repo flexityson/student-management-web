@@ -33,7 +33,6 @@ Set these in your Vercel dashboard under Environment Variables:
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `TEACHER_ACCESS_CODE`
-- `NODE_ENV=production`
 
 ### 🗄️ Database Setup
 
