@@ -4,16 +4,7 @@
  */
 
 export default function handler(req, res) {
-  // Set CORS headers for production
-  const origin = req.headers.origin;
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'https://student-management-v1.vercel.app'
-  ];
-  
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+  // Set CORS headers (handled by vercel.json, but keeping for local development)
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   

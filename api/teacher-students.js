@@ -1,17 +1,7 @@
 // Vercel Serverless Function for Teacher-Student Management
 // Handles CRUD operations for students with teacher-specific access control
 
-const { createClient } = require('@supabase/supabase-js');
-
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const { supabase, handleDatabaseError } = require('../utils/supabaseClient');
 
 // Helper function to validate student data
 function validateStudentData(data) {
@@ -23,7 +13,7 @@ function validateStudentData(data) {
   }
   
   // Validate grade format
-  const gradeRegex = /^[K-9][0-9]*(st|nd|rd|th)? Grade$/i;
+  const gradeRegex = /^[Kk9][0-9]*(st|nd|rd|th)? Grade$/i;
   if (!gradeRegex.test(data.grade) && !/^[0-9]+[A-Z]?$/.test(data.grade)) {
     throw new Error('Invalid grade format. Use formats like "5th Grade", "K", or "5A"');
   }
@@ -55,16 +45,7 @@ async function verifyTeacher(authHeader) {
 
 // Main handler function
 module.exports = async (req, res) => {
-  // Set CORS headers for production
-  const origin = req.headers.origin;
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'https://student-management-v1.vercel.app'
-  ];
-  
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+  // Set CORS headers (handled by vercel.json, but keeping for local development)
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
@@ -98,7 +79,7 @@ module.exports = async (req, res) => {
         });
     }
   } catch (error) {
-    console.error('API Error:', error);
+    const errorResponse = handleDatabaseError(error, 'Teacher-Students API');
     
     if (error.message.includes('Authentication') || error.message.includes('authorization')) {
       return res.status(401).json({
@@ -107,11 +88,7 @@ module.exports = async (req, res) => {
       });
     }
     
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    return res.status(errorResponse.code === 'PGRST116' ? 404 : 500).json(errorResponse);
   }
 };
 
@@ -160,12 +137,8 @@ async function handleGetStudents(req, res, teacherId) {
     const { data: students, error, count } = await query;
     
     if (error) {
-      console.error('Supabase GET Error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to retrieve students',
-        error: error.message
-      });
+      const errorResponse = handleDatabaseError(error, 'GET Teacher Students');
+      return res.status(errorResponse.code === 'PGRST116' ? 404 : 500).json(errorResponse);
     }
     
     return res.status(200).json({
@@ -179,12 +152,8 @@ async function handleGetStudents(req, res, teacherId) {
       }
     });
   } catch (error) {
-    console.error('GET Students Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve students',
-      error: error.message
-    });
+    const errorResponse = handleDatabaseError(error, 'GET Teacher Students');
+    return res.status(500).json(errorResponse);
   }
 }
 
@@ -216,12 +185,8 @@ async function handleCreateStudent(req, res, teacherId) {
       .single();
     
     if (error) {
-      console.error('Supabase INSERT Error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to create student',
-        error: error.message
-      });
+      const errorResponse = handleDatabaseError(error, 'Create Teacher Student');
+      return res.status(500).json(errorResponse);
     }
     
     return res.status(201).json({
@@ -230,12 +195,8 @@ async function handleCreateStudent(req, res, teacherId) {
       data: data
     });
   } catch (error) {
-    console.error('POST Students Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to create student',
-      error: error.message
-    });
+    const errorResponse = handleDatabaseError(error, 'POST Teacher Students');
+    return res.status(500).json(errorResponse);
   }
 }
 
@@ -272,12 +233,8 @@ async function handleUpdateStudent(req, res, teacherId) {
       .single();
     
     if (error) {
-      console.error('Supabase UPDATE Error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to update student',
-        error: error.message
-      });
+      const errorResponse = handleDatabaseError(error, 'Update Teacher Student');
+      return res.status(500).json(errorResponse);
     }
     
     if (!data) {
@@ -293,12 +250,8 @@ async function handleUpdateStudent(req, res, teacherId) {
       data: data
     });
   } catch (error) {
-    console.error('PUT Students Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to update student',
-      error: error.message
-    });
+    const errorResponse = handleDatabaseError(error, 'PUT Teacher Students');
+    return res.status(500).json(errorResponse);
   }
 }
 
@@ -322,12 +275,8 @@ async function handleDeleteStudent(req, res, teacherId) {
       .eq('teacher_id', teacherId); // Double-check teacher ownership
     
     if (error) {
-      console.error('Supabase DELETE Error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to delete student',
-        error: error.message
-      });
+      const errorResponse = handleDatabaseError(error, 'Delete Teacher Student');
+      return res.status(500).json(errorResponse);
     }
     
     return res.status(200).json({
@@ -335,11 +284,7 @@ async function handleDeleteStudent(req, res, teacherId) {
       message: 'Student deleted successfully'
     });
   } catch (error) {
-    console.error('DELETE Students Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to delete student',
-      error: error.message
-    });
+    const errorResponse = handleDatabaseError(error, 'DELETE Teacher Students');
+    return res.status(500).json(errorResponse);
   }
 }

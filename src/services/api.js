@@ -185,7 +185,7 @@ export const StudentService = {
         }
 
         // Validate grade format
-        const gradeRegex = /^[Kk][0-9]*(st|nd|rd|th)? Grade$/i
+        const gradeRegex = /^[Kk9][0-9]*(st|nd|rd|th)? Grade$/i
         if (!gradeRegex.test(studentData.grade) && !/^[0-9]+[A-Z]?$/.test(studentData.grade)) {
           throw new Error('Invalid grade format. Use formats like "5th Grade", "K", or "5A"')
         }

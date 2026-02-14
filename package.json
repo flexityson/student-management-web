@@ -36,14 +36,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/studenthub-management.git"
+    "url": "git+https://github.com/flexityson/student-management-web.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/studenthub-management/issues"
+    "url": "https://github.com/flexityson/student-management-web/issues"
   },
-  "homepage": "https://github.com/your-username/studenthub-management#readme",
+  "homepage": "https://github.com/flexityson/student-management-web#readme",
   "engines": {
-    "node": "24.x"
+    "node": ">=18.x"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",

@@ -1,17 +1,7 @@
 // Vercel Serverless Function for Homework API
 // Handles GET and POST requests for homework management using Supabase
 
-const { createClient } = require('@supabase/supabase-js');
-
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const { supabase, handleDatabaseError, validateTeacherAccess } = require('../utils/supabaseClient');
 
 // Helper function to validate homework data
 function validateHomeworkData(data) {
@@ -34,22 +24,24 @@ function validateHomeworkData(data) {
 
 // Main handler function
 module.exports = async (req, res) => {
-  // Set CORS headers for production
-  const origin = req.headers.origin;
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'https://student-management-v1.vercel.app'
-  ];
-  
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+  // Set CORS headers (handled by vercel.json, but keeping for local development)
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+  
+  // Validate teacher access for non-OPTIONS requests
+  if (req.method !== 'OPTIONS') {
+    const auth = validateTeacherAccess(req);
+    if (!auth.valid) {
+      return res.status(401).json({
+        success: false,
+        message: auth.error
+      });
+    }
   }
   
   try {
@@ -67,12 +59,8 @@ module.exports = async (req, res) => {
         });
     }
   } catch (error) {
-    console.error('API Error:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    const errorResponse = handleDatabaseError(error, 'Homework API');
+    return res.status(errorResponse.code === 'PGRST116' ? 404 : 500).json(errorResponse);
   }
 };
 
@@ -122,12 +110,8 @@ async function handleGetHomework(req, res) {
     const { data: homework, error, count } = await query;
     
     if (error) {
-      console.error('Supabase GET Error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to retrieve homework',
-        error: error.message
-      });
+      const errorResponse = handleDatabaseError(error, 'GET Homework');
+      return res.status(errorResponse.code === 'PGRST116' ? 404 : 500).json(errorResponse);
     }
     
     return res.status(200).json({
@@ -179,12 +163,8 @@ async function handleCreateHomework(req, res) {
       .single();
     
     if (error) {
-      console.error('Supabase INSERT Error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to create homework',
-        error: error.message
-      });
+      const errorResponse = handleDatabaseError(error, 'Create Homework');
+      return res.status(500).json(errorResponse);
     }
     
     return res.status(201).json({
@@ -193,11 +173,7 @@ async function handleCreateHomework(req, res) {
       data: data
     });
   } catch (error) {
-    console.error('POST Homework Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to create homework',
-      error: error.message
-    });
+    const errorResponse = handleDatabaseError(error, 'POST Homework');
+    return res.status(500).json(errorResponse);
   }
 }
